@@ -1,14 +1,9 @@
 package me.shinsunyoung.springbootdeveloper.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.util.List;
-import javax.print.attribute.standard.Media;
+import me.shinsunyoung.springbootdeveloper.domain.Article;
+import me.shinsunyoung.springbootdeveloper.dto.AddArticleRequest;
+import me.shinsunyoung.springbootdeveloper.dto.UpdateArticleRequest;
+import me.shinsunyoung.springbootdeveloper.repository.BlogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,20 +15,24 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import me.shinsunyoung.springbootdeveloper.domain.Article;
-import me.shinsunyoung.springbootdeveloper.dto.AddArticleRequest;
-import me.shinsunyoung.springbootdeveloper.dto.UpdateArticleRequest;
-import me.shinsunyoung.springbootdeveloper.repository.BlogRepository;
+import tools.jackson.databind.ObjectMapper;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class BlogApiControllerTest {
-
+class BlogApiControllerTest {
     @Autowired
     protected MockMvc mockMvc;
 
     @Autowired
-    protected tools.jackson.databind.ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     @Autowired
     private WebApplicationContext context;
@@ -42,9 +41,8 @@ public class BlogApiControllerTest {
     BlogRepository blogRepository;
 
     @BeforeEach
-    public void mockMvcSetup() {
+    public void mockMvcSetUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-
         blogRepository.deleteAll();
     }
 
@@ -57,22 +55,19 @@ public class BlogApiControllerTest {
         final String content = "content";
         final AddArticleRequest userRequest = new AddArticleRequest(title, content);
 
-        // Object deserialize to JSON
         final String requestBody = objectMapper.writeValueAsString(userRequest);
 
         // when
         ResultActions result = mockMvc.perform(
                 post(url).contentType(MediaType.APPLICATION_JSON_VALUE).content(requestBody));
 
+
         // then
         result.andExpect(status().isCreated());
-
         List<Article> articles = blogRepository.findAll();
-
         assertThat(articles.size()).isEqualTo(1);
         assertThat(articles.get(0).getTitle()).isEqualTo(title);
         assertThat(articles.get(0).getContent()).isEqualTo(content);
-
     }
 
     @DisplayName("findAllArticles: 블로그 글 목록 조회에 성공한다.")
@@ -82,7 +77,6 @@ public class BlogApiControllerTest {
         final String url = "/api/articles";
         final String title = "title";
         final String content = "content";
-
         blogRepository.save(Article.builder().title(title).content(content).build());
 
         // when
@@ -94,6 +88,7 @@ public class BlogApiControllerTest {
                 .andExpect(jsonPath("$[0].title").value(title));
     }
 
+
     @DisplayName("findArticle: 블로그 글 조회에 성공한다.")
     @Test
     public void findArticle() throws Exception {
@@ -101,7 +96,6 @@ public class BlogApiControllerTest {
         final String url = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";
-
         Article savedArticle =
                 blogRepository.save(Article.builder().title(title).content(content).build());
 
@@ -111,7 +105,6 @@ public class BlogApiControllerTest {
         // then
         resultActions.andExpect(status().isOk()).andExpect(jsonPath("$.content").value(content))
                 .andExpect(jsonPath("$.title").value(title));
-
     }
 
     @DisplayName("deleteArticle: 블로그 글 삭제에 성공한다.")
@@ -121,7 +114,6 @@ public class BlogApiControllerTest {
         final String url = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";
-
         Article savedArticle =
                 blogRepository.save(Article.builder().title(title).content(content).build());
 
@@ -130,7 +122,6 @@ public class BlogApiControllerTest {
 
         // then
         List<Article> articles = blogRepository.findAll();
-
         assertThat(articles).isEmpty();
     }
 
@@ -141,13 +132,10 @@ public class BlogApiControllerTest {
         final String url = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";
-
         Article savedArticle =
                 blogRepository.save(Article.builder().title(title).content(content).build());
-
         final String newTitle = "new title";
         final String newContent = "new content";
-
         UpdateArticleRequest request = new UpdateArticleRequest(newTitle, newContent);
 
         // when
@@ -157,12 +145,8 @@ public class BlogApiControllerTest {
 
         // then
         result.andExpect(status().isOk());
-
         Article article = blogRepository.findById(savedArticle.getId()).get();
-
         assertThat(article.getTitle()).isEqualTo(newTitle);
         assertThat(article.getContent()).isEqualTo(newContent);
-
-
     }
 }
