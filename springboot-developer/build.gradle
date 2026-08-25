@@ -46,6 +46,11 @@ dependencies {
 	implementation platform('org.springframework.ai:spring-ai-bom:2.0.0-M1')
 	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.projectlombok:lombok'
+
+	implementation 'io.jsonwebtoken:jjwt:0.9.1' // java JWT library
+	implementation 'javax.xml.bind:jaxb-api:2.3.1' // Mapping Automation Between XML Docs and JAVA Object
 }
 
 tasks.named('test') {

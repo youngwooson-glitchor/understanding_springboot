@@ -14,3 +14,6 @@ spring:
   ai:
     openai:
       api-key: ...
+jwt:
+  issuer: ajufresh@gmail.com
+  secret_key: study-springboot
