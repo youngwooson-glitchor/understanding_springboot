@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.security.Principal;
@@ -25,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import me.shinsunyoung.springbootdeveloper.config.error.ErrorCode;
 import me.shinsunyoung.springbootdeveloper.domain.Article;
 import me.shinsunyoung.springbootdeveloper.domain.User;
 import me.shinsunyoung.springbootdeveloper.dto.AddArticleRequest;
@@ -192,7 +194,7 @@ class BlogApiControllerTest {
                 mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE)
                         .principal(principal).content(requestBody));
         // then
-        result.andExpect(status().isBadRequest());
+        result.andDo(print()).andExpect(status().isBadRequest());
 
     }
 
@@ -217,12 +219,28 @@ class BlogApiControllerTest {
                 mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE)
                         .principal(principal).content(requestBody));
         // then
-        result.andExpect(status().isBadRequest());
+        result.andDo(print()).andExpect(status().isBadRequest());
     }
+
 
 
     private Article createDefaultArticle() {
         return blogRepository.save(Article.builder().title("title").author(user.getUsername())
                 .content("content").build());
+    }
+
+
+    @DisplayName("findArticle: 잘못된 HTTP Method로 Article을 조회하려고하면 조회에 실패한다.")
+    @Test
+    public void invalidHttpMethod() throws Exception {
+        // given
+        final String url = "/api/articles/{id}";
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(post(url, 1));
+
+        // then
+        resultActions.andDo(print()).andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.message").value(ErrorCode.METHOD_NOT_ALLOWED.getMessage()));
     }
 }
