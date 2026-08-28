@@ -53,6 +53,9 @@ dependencies {
 	implementation 'javax.xml.bind:jaxb-api:2.3.1' // Mapping Automation Between XML Docs and JAVA Object
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // add starter for 0Auth2
+
+    implementation 'org.springframework.boot:spring-boot-starter-validation' // add starter for validation
+    testImplementation 'net.datafaker:datafaker:2.5.4' // add starter for datafaker
 }
 
 tasks.named('test') {

@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +36,7 @@ public class BlogApiController {
     // When method is post, passed url if it is equal to http method
     @PostMapping("/api/articles")
     // mapping request body value that from @Requestbody
-    public ResponseEntity<Article> addArticle(@RequestBody AddArticleRequest request,
+    public ResponseEntity<Article> addArticle(@RequestBody @Validated AddArticleRequest request,
             Principal pricipal) {
         Article savedArticle = blogService.save(request, pricipal.getName());
 
