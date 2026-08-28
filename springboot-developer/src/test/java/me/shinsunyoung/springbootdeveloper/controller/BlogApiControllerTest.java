@@ -31,6 +31,7 @@ import me.shinsunyoung.springbootdeveloper.dto.AddArticleRequest;
 import me.shinsunyoung.springbootdeveloper.dto.UpdateArticleRequest;
 import me.shinsunyoung.springbootdeveloper.repository.BlogRepository;
 import me.shinsunyoung.springbootdeveloper.repository.UserRepository;
+import net.datafaker.Faker;
 import tools.jackson.databind.ObjectMapper;
 
 
@@ -171,6 +172,54 @@ class BlogApiControllerTest {
         assertThat(article.getTitle()).isEqualTo(newTitle);
         assertThat(article.getContent()).isEqualTo(newContent);
     }
+
+    @DisplayName("addArticle: 아티클 추가할 때 title이 null이면 실패한다.")
+    @Test
+    public void addArticleNullValidation() throws Exception {
+        // given
+        final String url = "/api/articles";
+        final String title = null;
+        final String content = "content";
+        final AddArticleRequest userRequest = new AddArticleRequest(title, content);
+
+        final String requestBody = objectMapper.writeValueAsString(userRequest);
+
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn("username");
+
+        // when
+        ResultActions result =
+                mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .principal(principal).content(requestBody));
+        // then
+        result.andExpect(status().isBadRequest());
+
+    }
+
+    @DisplayName("addArticle: 아티클 추가할 때 title이 10자를 넘으면 실패한다.")
+    @Test
+    public void addArticleSizeValidation() throws Exception {
+        // given
+        Faker faker = new Faker();
+
+        final String url = "/api/articles";
+        final String title = faker.lorem().characters(11);
+        final String content = "content";
+        final AddArticleRequest userRequest = new AddArticleRequest(title, content);
+
+        final String requestBody = objectMapper.writeValueAsString(userRequest);
+
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn("username");
+
+        // when
+        ResultActions result =
+                mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .principal(principal).content(requestBody));
+        // then
+        result.andExpect(status().isBadRequest());
+    }
+
 
     private Article createDefaultArticle() {
         return blogRepository.save(Article.builder().title("title").author(user.getUsername())
