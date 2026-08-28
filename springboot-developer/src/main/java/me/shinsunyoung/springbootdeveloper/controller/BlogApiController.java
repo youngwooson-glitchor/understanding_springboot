@@ -1,5 +1,6 @@
 package me.shinsunyoung.springbootdeveloper.controller;
 
+import java.security.Principal;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +35,9 @@ public class BlogApiController {
     // When method is post, passed url if it is equal to http method
     @PostMapping("/api/articles")
     // mapping request body value that from @Requestbody
-    public ResponseEntity<Article> addArticle(@RequestBody AddArticleRequest request) {
-        Article savedArticle = blogService.save(request);
+    public ResponseEntity<Article> addArticle(@RequestBody AddArticleRequest request,
+            Principal pricipal) {
+        Article savedArticle = blogService.save(request, pricipal.getName());
 
         // send saved article content in response object if requested resource is successfully
         // created

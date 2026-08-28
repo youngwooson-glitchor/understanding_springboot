@@ -19,8 +19,9 @@ public class AddArticleRequest {
         this.content = content;
     }
 
-    public Article toEntity() {
-        return Article.builder().title(title).content(content).imageUrl(imageUrl).build();
+    public Article toEntity(String author) {
+        return Article.builder().title(title).content(content).author(author).imageUrl(imageUrl)
+                .build();
     }
 
 
