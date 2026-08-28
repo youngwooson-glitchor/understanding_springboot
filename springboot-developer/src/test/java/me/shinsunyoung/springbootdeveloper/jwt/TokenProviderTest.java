@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import io.jsonwebtoken.Jwts;
 import me.shinsunyoung.springbootdeveloper.config.jwt.JwtProperties;
 import me.shinsunyoung.springbootdeveloper.config.jwt.TokenProvider;
@@ -17,6 +19,7 @@ import me.shinsunyoung.springbootdeveloper.domain.User;
 import me.shinsunyoung.springbootdeveloper.repository.UserRepository;
 
 @SpringBootTest
+@Transactional
 public class TokenProviderTest {
     @Autowired
     private TokenProvider tokenProvider;
@@ -24,6 +27,12 @@ public class TokenProviderTest {
     private UserRepository userRepository;
     @Autowired
     private JwtProperties jwtProperties;
+
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+        userRepository.flush();
+    }
 
     // generateToken() test
     @DisplayName("generateToken(): 유저정보와 만료기간을 전달해 토큰을 만들 수 있다.")
